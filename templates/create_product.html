@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container bg-white h-100 mt-3 pt-5 rounded">
+    <h2 class="text-center mb-4">Create Your Product Here</h2>
+
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    {% for field, errors in form.errors.items() %}
+        {% for error in errors %}
+            <div class="alert alert-danger">{{ error }}</div>
+        {% endfor %}
+    {% endfor %}
+
+    <div class="container bg-danger text-white rounded p-5">
+        <form method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="row mt-5">
+                {{ form.name(class="form-control", placeholder=form.name.label.text) }}
+            </div>
+            <div class="row mt-5">
+                {{ form.price(class="form-control", placeholder=form.price.label.text) }}
+            </div>
+            <div class="row mt-5">
+                {{ form.img(class="form-control", placeholder=form.img.label.text, accept=".jpg,.png,.jpeg") }}
+            </div>
+
+            <div class="row mt-5">
+                {{ form.grape(class="form-control", placeholder="Grape") }}
+            </div>
+            <div class="row mt-5">
+                {{ form.region(class="form-control", placeholder="Region") }}
+            </div>
+            <div class="row mt-5">
+                {{ form.aroma(class="form-control", placeholder="Aroma") }}
+            </div>
+            <div class="row mt-5">
+                {{ form.taste(class="form-control", placeholder="Taste") }}
+            </div>
+            <div class="row mt-5">
+                {{ form.color(class="form-control", placeholder="Color") }}
+            </div>
+            <div class="row mt-5">
+                {{ form.submit(class="btn btn-primary w-100") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

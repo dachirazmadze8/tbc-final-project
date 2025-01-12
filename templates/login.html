@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container bg-white h-100 mt-3 pt-5 rounded">
+    <h2 class="text-center mb-4">Create Your Product Here</h2>
+    <div class="container bg-danger text-white rounded p-5">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <div class="row mt-5">
+                {{ form.username(class="form-control", placeholder=form.username.label.text) }}
+            </div>
+            <div class="row mt-5">
+                {{ form.password(class="form-control", placeholder=form.password.label.text) }}
+            </div>
+            <div class="row mt-2">
+    <div class="form-check">
+        {{ form.remember_me(class="form-check-input", id="rememberMe") }}
+        <label class="form-check-label" for="rememberMe">Remember Me</label>
+    </div>
+</div>
+
+
+
+            <div class="row mt-5">
+                {{ form.login(class="btn btn-primary w-100") }}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-2">
+      <div class="card">
+        <div class="card-header text-center">
+          <h5>Filter by Price</h5>
+        </div>
+        <div class="card-body">
+          <form method="GET" action="/products">
+            <div class="mb-3">
+              <label for="minPrice" class="form-label">Min Price</label>
+              <input type="number" class="form-control" id="minPrice" name="min_price" placeholder="0">
+            </div>
+            <div class="mb-3">
+              <label for="maxPrice" class="form-label">Max Price</label>
+              <input type="number" class="form-control" id="maxPrice" name="max_price" placeholder="1000">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Specific Prices</label>
+              <div class="d-flex flex-wrap gap-2">
+                <a href="/products?specific_price=10" class="btn btn-outline-primary">10</a>
+                <a href="/products?specific_price=30" class="btn btn-outline-primary">30</a>
+                <a href="/products?specific_price=50" class="btn btn-outline-primary">50</a>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Apply Min/Max Filter</button>
+          </form>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-10">
+      <div class="row">
+       {% for product in products %}
+<div class="col-md-4 mb-4">
+  <div class="card">
+    <img src="{{ url_for('static', filename=product.img) }}" class="card-img-top" alt="{{ product.name }}">
+    <div class="card-body">
+      <h5 class="card-title">{{ product.name }}</h5>
+      <p class="card-text">${{ product.price }}</p>
+      <a href="/product/{{ product.id }}" class="btn btn-success">Details</a>
+      {% if current_user.role == "admin" %}
+      <a href="/editproduct/{{ product.id }}" class="btn btn-primary">Edit</a>
+      <a href="/deleteproduct/{{ product.id }}" class="btn btn-danger">Delete</a>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endfor %}
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+
+

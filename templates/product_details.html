@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-start">
+    <div class="col-md-4">
+      <div class="card" style="width: 100%;">
+        <img src="{{ url_for('static', filename=product.img) }}" class="card-img-top" alt="{{ product.name }}">
+        <div class="card-body">
+          <h5 class="card-title">{{ product.name }}</h5>
+          <p class="card-text">${{ product.price }}</p>
+          <p class="card-text">This is placeholder text for product details.</p>
+          <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST" class="d-flex flex-column mb-3">
+            <div class="d-flex align-items-center mb-3">
+              <div class="me-2">
+                <label for="quantity" class="form-label">Quantity:</label>
+                <input type="number" name="quantity" id="quantity" class="form-control w-auto" min="1" value="1">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-warning text-dark mt-2">Add to Cart</button>
+          </form>
+          <a href="#" class="btn btn-secondary mt-4">Purchase</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 offset-md-2">
+      <div class="card">
+        <div class="card-body" style="font-size: 1.5rem;">
+          <h5 class="card-title">Categories</h5>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+              <strong>Grape:</strong> {{ product.grape }}
+            </li>
+            <li class="list-group-item">
+              <strong>Region:</strong> {{ product.region }}
+            </li>
+            <li class="list-group-item">
+              <strong>Aroma:</strong> {{ product.aroma }}
+            </li>
+            <li class="list-group-item">
+              <strong>Taste:</strong> {{ product.taste }}
+            </li>
+            <li class="list-group-item">
+              <strong>Color:</strong> {{ product.color }}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-md-12">
+      <div class="card text-bg-dark">
+        <div class="card-body">
+          <h5 class="card-title">Ratings</h5>
+          <p class="card-text">
+            Average Rating:
+            {% if product.average_rating %}
+              {{ "%.1f"|format(product.average_rating) }} / 5
+            {% else %}
+              No ratings yet
+            {% endif %}
+          </p>
+
+          {% if current_user.is_authenticated %}
+          <form action="{{ url_for('rate_product', product_id=product.id) }}" method="POST">
+            <div class="form-group">
+              <label for="rating">Rate this product:</label>
+              <select name="rating" id="rating" class="form-select w-auto">
+                <option value="1" {% if user_rating == 1 %}selected{% endif %}>1 Star</option>
+                <option value="2" {% if user_rating == 2 %}selected{% endif %}>2 Stars</option>
+                <option value="3" {% if user_rating == 3 %}selected{% endif %}>3 Stars</option>
+                <option value="4" {% if user_rating == 4 %}selected{% endif %}>4 Stars</option>
+                <option value="5" {% if user_rating == 5 %}selected{% endif %}>5 Stars</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">
+              {% if user_rating %}
+                Change Rating
+              {% else %}
+                Submit
+              {% endif %}
+            </button>
+          </form>
+          {% else %}
+          <p><a href="{{ url_for('login') }}">Log in</a> to rate this product.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
