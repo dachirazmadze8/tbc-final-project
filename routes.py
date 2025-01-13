@@ -4,7 +4,8 @@ from os import path
 from uuid import uuid4
 from ext import app,db
 from models import Product, User,Cart,CartItem,Rating
-from flask_login import login_user,logout_user,login_required,current_user,LoginManager
+from flask_login import login_user,logout_user,login_required,current_user
+
 
 
 
@@ -91,36 +92,41 @@ def create_product():
     return render_template("create_product.html", form=form)
 
 
+
+
 @app.route("/editproduct/<int:product_id>", methods=["GET", "POST"])
 @login_required
 def edit_product(product_id):
     if current_user.role != "admin":
         return redirect("/error")
-
     product = Product.query.get(product_id)
     if not product:
-        return redirect("/error2")
-
+        flash("Product does not exist!","success")
+        return redirect('/products')
     form = ProductForm(obj=product)
     if form.validate_on_submit():
-        product.name = form.name.data
-        product.price = form.price.data
-        product.grape = form.grape.data
-        product.region = form.region.data
-        product.aroma = form.aroma.data
-        product.taste = form.taste.data
-        product.color = form.color.data
-
-        if form.img.data:
-            file = form.img.data
-            filename, filetype = path.splitext(file.filename)
-            filename = f"{uuid4()}{filetype}"
-            filepath = path.join(app.root_path, "static", filename)
-            file.save(filepath)
-            product.img = filename
-
-        db.session.commit()
-        return redirect("/products")
+        try:
+            product.name = form.name.data
+            product.price = float(form.price.data)
+            product.grape = form.grape.data
+            product.region = form.region.data
+            product.aroma = form.aroma.data
+            product.taste = form.taste.data
+            product.color = form.color.data
+            if form.img.data:
+                file = form.img.data
+                filename, filetype = path.splitext(file.filename)
+                filename = f"{uuid4()}{filetype}"
+                filepath = path.join(app.root_path, "static", filename)
+                file.save(filepath)
+                product.img = filename
+            db.session.commit()
+            flash("Product updated successfully!", "success")
+            return redirect("/products")
+        except ValueError:
+            flash("Invalid price format. Please enter a numeric value.", "danger")
+        except Exception as e:
+            flash(f"An error occurred: {str(e)}", "danger")
 
     return render_template("create_product.html", form=form)
 
@@ -130,12 +136,18 @@ def edit_product(product_id):
 def delete_product(product_id):
     if current_user.role != "admin":
         return redirect("/error")
-
     product = Product.query.get(product_id)
+    if not product:
+        flash("Product does not exist!", "success")
+        return redirect('/products')
+
+    product = Product.query.get_or_404(product_id)
     if product:
         db.session.delete(product)
         db.session.commit()
-    return redirect("/products")
+        flash('Product deleted successfully', 'success')
+    return redirect(url_for('products'))
+
 
 @app.route("/product/<int:product_id>")
 @login_required
@@ -152,30 +164,25 @@ def product_details(product_id):
 
 
 
-@app.route("/rate/<int:product_id>", methods=["POST"])
+@app.route('/rate_product', methods=['POST'])
 @login_required
-def rate_product(product_id):
-    rating_value = int(request.form.get("rating", 0))
-    if not (1 <= rating_value <= 5):
-        flash("Invalid rating. Please choose a value between 1 and 5.", "error")
-        return redirect(url_for("product_details", product_id=product_id))
-
-    existing_rating = Rating.query.filter_by(product_id=product_id, user_id=current_user.id).first()
-
-    if existing_rating:
-        existing_rating.rating = rating_value
-        flash("Your rating has been updated.", "success")
+def rate_product():
+    product_id = request.form.get('product_id')
+    rating_value = request.form.get('rating')
+    product = Product.query.get(product_id)
+    if not product:
+        flash("Product does not exist.", "danger")
+        return redirect(url_for('home'))
+    rating = Rating.query.filter_by(user_id=current_user.id, product_id=product_id).first()
+    if rating:
+        rating.rating = rating_value
     else:
-        new_rating = Rating(product_id=product_id, user_id=current_user.id, rating=rating_value)
-        db.session.add(new_rating)
-        flash("Thank you for your rating!", "success")
+        rating = Rating(product_id=product_id, user_id=current_user.id, rating=rating_value)
+        db.session.add(rating)
 
     db.session.commit()
-    return redirect(url_for("product_details", product_id=product_id))
-
-
-
-
+    flash("Your rating has been submitted!", "success")
+    return redirect(url_for('product_details', product_id=product_id))
 
 @app.route("/add_to_cart/<int:product_id>", methods=["POST"])
 @login_required

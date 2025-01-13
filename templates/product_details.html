@@ -61,9 +61,9 @@
               No ratings yet
             {% endif %}
           </p>
-
           {% if current_user.is_authenticated %}
-          <form action="{{ url_for('rate_product', product_id=product.id) }}" method="POST">
+          <form action="{{ url_for('rate_product') }}" method="POST">
+            <input type="hidden" name="product_id" value="{{ product.id }}">
             <div class="form-group">
               <label for="rating">Rate this product:</label>
               <select name="rating" id="rating" class="form-select w-auto">

@@ -8,7 +8,6 @@ class Rating(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     rating = db.Column(db.Integer, nullable=False)
-
     product = db.relationship('Product', back_populates='ratings')
     user = db.relationship('User', back_populates='ratings')
 
@@ -16,14 +15,16 @@ class Rating(db.Model):
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
-    price = db.Column(db.Integer)
+    price = db.Column(db.Float)
     img = db.Column(db.String)
     grape = db.Column(db.String)
     region = db.Column(db.String)
     aroma = db.Column(db.String)
     taste = db.Column(db.String)
     color = db.Column(db.String)
-    ratings = db.relationship('Rating', back_populates='product', lazy='dynamic')
+    ratings = db.relationship('Rating', back_populates='product',cascade='all,delete-orphan', lazy='dynamic')
+    cart_items = db.relationship('CartItem',back_populates='product',cascade="all, delete-orphan",lazy='dynamic')
+
 
     @property
     def average_rating(self):
@@ -43,7 +44,7 @@ class CartItem(db.Model):
     cart_id = db.Column(db.Integer, db.ForeignKey("cart.id"), nullable=False)
     cart = db.relationship("Cart", back_populates="items")
     product_id = db.Column(db.Integer, db.ForeignKey("product.id"), nullable=False)
-    product = db.relationship("Product")
+    product = db.relationship('Product', back_populates='cart_items', lazy=True)
     quantity = db.Column(db.Integer, nullable=False, default=1)
 
 
