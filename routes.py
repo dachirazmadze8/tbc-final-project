@@ -4,7 +4,7 @@ from os import path
 from uuid import uuid4
 from ext import app,db
 from models import Product, User,Cart,CartItem,Rating
-from flask_login import login_user,logout_user,login_required,current_user
+from flask_login import login_user,logout_user,login_required,current_user,LoginManager
 
 
 
